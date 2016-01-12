@@ -5,8 +5,6 @@ import java.util.Scanner;
 import assignment1.Collections;
 import assignment1.Identifier;
 
-// test of git werkt!
-
 public class Main {
 	PrintStream out;
 	APException e;
@@ -91,7 +89,6 @@ public class Main {
 	}
 	
 	void processExpression(String statement){
-	
 		
 	}
 	

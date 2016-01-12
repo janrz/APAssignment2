@@ -9,7 +9,7 @@ public class Identifier implements IdentifierInterface {
 		stringBuffer = new StringBuffer();
 	}
 	
-	Identifier(Identifier src){
+	public Identifier(Identifier src){
 		stringBuffer = new StringBuffer();
 		stringBuffer.append(src.get());
 	}
