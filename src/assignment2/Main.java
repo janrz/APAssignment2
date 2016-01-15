@@ -22,9 +22,9 @@ public class Main {
 				processStatement(statement);
 			}catch (APException e) {
 				out.print(e);
-				}
 			}
 		}
+	}
 	
 	void processProgram(Scanner input){
 
@@ -34,7 +34,7 @@ public class Main {
 		statement = statement.trim();
 		if (statement.isEmpty()) {
 			return;
-			}
+		}
 		char ch = statement.charAt(0);
 		if (ch == '/') {
 			processComment(statement);
@@ -62,16 +62,18 @@ public class Main {
 	}
 
 	void processAssignment(String statement) throws APException {
-		 StringBuffer identifierStringBuffer = new StringBuffer();
-		 int counter = 0;
-		 while (!(statement.charAt(counter) == '=')){
+		StringBuffer identifierStringBuffer = new StringBuffer();
+		int counter = 0;
+		while (!(statement.charAt(counter) == '=')){
 			identifierStringBuffer.append(statement.charAt(counter));
 			counter ++;
-		 }
-			Identifier identifier = createIdentifier(identifierStringBuffer.toString());
-			counter +=2;
-			StringBuffer expressionStringBuffer = new StringBuffer();			
-		 }
+		}
+		Identifier identifier = createIdentifier(identifierStringBuffer.toString());
+		
+		counter +=2;
+		
+		
+	}
 
 	Identifier createIdentifier(String statement) throws APException {
 		statement = statement.trim();
@@ -145,34 +147,30 @@ public class Main {
 	}
 	
 	void processFactor (String statement){
+		
 	}
 	
-	char processNumber (int num) throws APException {
-		Number number = new Number();
-		
+	void processNumber (int num) throws APException {		
 	    if (num > 0 && num < 10) {
-			number.add(in);
-			}
-			else if (! in.hasNext("[0]")){ 
-			processZero(int input);
-			} else {
-				throw new APException("No valide Number");
-			}
+			processNotZero(num);
+		} else if (num == 0) { 
+			processZero(num);
+		} else {
+			throw new APException("No valid number");
 		}
-
+	}
 
 	char processZero (int input) throws APException {
 		Number number = new Number();
 		number.add(input);
 		throw new APException("Not zero");
-	    }
+	}
 
-	
 	char processNotZero (int input) throws APException {
 		Number number = new Number();
 		number.add(input);
 		throw new APException("No number object");
-	    }
+	}
 	
 	void processLetter(String statement){
 		char ch = statement.charAt(0);
@@ -194,6 +192,7 @@ public class Main {
 	public static void main(String[] args){ //throws APException {
 		new Main().start();
 		//throw new APException("...");
+		//TODO waarom die exception?
 	}
 
 }
