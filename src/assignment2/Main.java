@@ -48,8 +48,6 @@ public class Main {
 	}
 	
 	void processComment (String statement) {
-		// TODO bepalen of hier verder nog iets moet gebeuren behalve doorgaan
-		// TODO moet hij ook een exception kunnen gooien? 
 		return;
 	}
 	
@@ -93,30 +91,44 @@ public class Main {
 	}
 	
 	void additiveOperator(String statement) throws APException{	
-		for (int i = 0; i<statement.length(); i++){
-			char ch = statement.charAt((i));
+		int i = 0;
+		boolean operatorFound = false;
+		while (i < statement.length() && operatorFound == false) {
+			char ch = statement.charAt(i);
 			if (ch == '+') {
+				operatorFound = true;
 				processUnion(statement);
 			} else if (ch == '-') {
+				operatorFound = true;
 				processDifference(statement);
 			} else if (ch == '|'){
+				operatorFound = true;
 				processSymmetricDifference(statement);
 			} else {
-				throw new APException("No additive operator");
-				}
+				i++;
 			}
 		}
+		if (i == statement.length() && operatorFound == false) {
+			throw new APException("No additive operator found");
+		}
+	}
 	
 	void multiplicativeOperator(String statement) throws APException{	
-		for (int i = 0; i<statement.length(); i++){
-			char ch = statement.charAt((i));
+		int i = 0;
+		boolean operatorFound = false;
+		while (i < statement.length() && operatorFound == false) {
+			char ch = statement.charAt(i);
 			if (ch == '*') {
+				operatorFound = true;
 				processIntersection(statement);
 			} else {
-				throw new APException("No multiplicative operator");
-				}
+				i++;
 			}
 		}
+		if (i == statement.length() && operatorFound == false) {
+			throw new APException("No multiplicative operator found");
+		}
+	}
 	
 	Collection createCollection (String statement){
 		Collection collectionObject = new Collection();
@@ -135,18 +147,18 @@ public class Main {
 	void processFactor (String statement){
 	}
 	
-	char processNumber (Scanner in) throws APException {
+	char processNumber (int num) throws APException {
 		Number number = new Number();
-	    if (! in.hasNext("[1-9]")) {
+		
+	    if (num > 0 && num < 10) {
 			number.add(in);
 			}
 			else if (! in.hasNext("[0]")){ 
 			processZero(int input);
+			} else {
+				throw new APException("No valide Number");
 			}
-				else {
-					throw new APException("No valide Number");
-				}
-			}
+		}
 
 
 	char processZero (int input) throws APException {
