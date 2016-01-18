@@ -2,56 +2,60 @@ package assignment2;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-import assignment1.Collections;
-import assignment1.Identifier;
-
 public class Main {
 	PrintStream out;
 	APException e;
-	//List<E> list;
+	// List<E> list; // TODO wat moet hiermee? stond er nog in
+	Table table = new Table();
 	
 	Main() {
 		out = new PrintStream(System.out);
 	}
 	
 	void start() {
-		String statement = "hoi = abdc";
 		Scanner in = new Scanner(System.in);
-		while (in.hasNext()){
+		while (in.hasNextLine()){
 			try {
+				Scanner statement = new Scanner(in.nextLine());
 				processStatement(statement);
-			}catch (APException e) {
+			} catch (APException e) {
 				out.print(e);
 			}
 		}
+		in.close(); // TODO moet deze erin?
 	}
 	
-	void processProgram(Scanner input){
-
-	}
-	
-	void processStatement(String statement) throws APException {	
-		statement = statement.trim();
-		if (statement.isEmpty()) {
+	void processStatement(Scanner statement) throws APException {
+		statement.useDelimiter("");
+		statement.skip("\\s*");
+		if (!statement.hasNext() || statement.hasNext("\\/")) {
 			return;
-		}
-		char ch = statement.charAt(0);
-		if (ch == '/') {
-			processComment(statement);
-		} else if (ch == '?') {
-			processPrintStatement(statement);
-		} else if (Character.isLetter(ch)){
+		} else if (statement.hasNext("[a-zA-Z]")) {
 			processAssignment(statement);
+		} else if (statement.hasNext("\\?")){
+			processPrintStatement(statement);
 		} else {
-			throw new APException("ongeldige regel");
+			throw new APException("Invalid line");
 		}
 	}
-	
-	void processComment (String statement) {
-		return;
+
+	void processAssignment(Scanner statement) throws APException {
+		statement.useDelimiter("\\s*=\\s*");
+		String identifierString = statement.next();
+		Identifier identifier = new Identifier();
+		if (!table.contains(identifierString)) {
+			identifier = createIdentifier(identifierString);
+		} else {
+			identifier = createIdentifier(table.retrieve(identifierString));
+		}
+		Scanner expression = new Scanner(statement.next());
+		Collection collection = new Collection();
+		processExpression(expression);
+		
+		table.insert(collection, identifier);
 	}
-	
-	void processPrintStatement (String statement) throws APException {
+
+	void processPrintStatement (Scanner statement) throws APException {
 		//TODO bepalen of er een fout kan zijn in een print statement: anders kan exception gooien ook weg
 		if (true) { // if geen fouten: print statement
 			out.print(statement); // als er geen fouten kunnen zijn is dit de enige regel
@@ -60,21 +64,7 @@ public class Main {
 		}
 		// TODO return toevoegen?
 	}
-
-	void processAssignment(String statement) throws APException {
-		StringBuffer identifierStringBuffer = new StringBuffer();
-		int counter = 0;
-		while (!(statement.charAt(counter) == '=')){
-			identifierStringBuffer.append(statement.charAt(counter));
-			counter ++;
-		}
-		Identifier identifier = createIdentifier(identifierStringBuffer.toString());
-		
-		counter +=2;
-		
-		
-	}
-
+	
 	Identifier createIdentifier(String statement) throws APException {
 		statement = statement.trim();
 		Identifier newIdentifier = new Identifier();
@@ -88,8 +78,18 @@ public class Main {
 		return newIdentifier;
 	}
 	
-	void processExpression(String statement){
-		
+	void processExpression(Scanner expression){
+		expression.useDelimiter("\\s*(\\s*|\\s*)\\s*");
+		processSet(set);
+	}
+	
+	Collection processSet(Scanner set) {
+		set.useDelimiter("\\s*,\\s*");
+		Collection collection = new Collection();
+		while (set.hasNext()) {
+			collection.add(set.next()); // collection zou elk type moeten kunnen hebben toch?
+		}
+		return collection;
 	}
 	
 	void additiveOperator(String statement) throws APException{	
@@ -140,7 +140,6 @@ public class Main {
 		}
 		return collectionObject;
 	}
-	
 	
 	Collection processUnion (String statement){
 		Collection collectionUnion = firstCollection.union(secondCollection);

@@ -13,7 +13,7 @@ public class Table< V extends ClonableInterface<V>,K extends DataInterface<K>> i
     @Override
     public void insert(V value, K key) {
         Variable newVariable = new Variable(value, key);
-        table.insert(newVariable);
+        table.insert(newVariable); // TODO check: eindeloze loop? volgens mij werkt dit niet
     }
  
     @Override

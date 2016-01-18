@@ -36,8 +36,7 @@ public class Collection<E extends DataInterface<E>> implements CollectionInterfa
             amountElements --;
         }
     }
-     
-     
+    
     public Collection<E> clone(){
         Collection<E> clonedCollection = new Collection<>();
         List<E> clonedList = collection.clone();
