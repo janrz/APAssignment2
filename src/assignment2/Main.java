@@ -41,13 +41,11 @@ public class Main {
 
 	void processAssignment(Scanner statement) throws APException {
 		statement.useDelimiter("\\s*=\\s*");
-		String identifierString = statement.next();
-		Identifier identifier = new Identifier();
-		if (!table.contains(identifierString)) {
-			identifier = createIdentifier(identifierString);
-		} else {
-			identifier = createIdentifier(table.retrieve(identifierString));
+		Identifier identifier = createIdentifier(statement.next());
+		if (table.contains(identifier)) {
+			identifier = (table.retrieve(identifier));
 		}
+		
 		Scanner expression = new Scanner(statement.next());
 		Collection collection = new Collection();
 		processExpression(expression);
