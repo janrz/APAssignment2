@@ -13,7 +13,7 @@ public class Table< V extends ClonableInterface<V>,K extends DataInterface<K>> i
     @Override
     public void insert(V value, K key) {
         Variable newVariable = new Variable(value, key);
-        table.insert(newVariable); // TODO check: eindeloze loop? volgens mij werkt dit niet
+        table.insert(newVariable);
     }
  
     @Override
@@ -28,6 +28,8 @@ public class Table< V extends ClonableInterface<V>,K extends DataInterface<K>> i
         return null;
     }
  
+    // TODO vragen of we ipv key ook identifier mogen gebruiken
+    
     @Override
     public boolean contains(K key) {
         table.goToFirst();

@@ -2,8 +2,6 @@ package assignment2;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-// jan is cool
-
 public class Main {
 	PrintStream out;
 	APException e;
@@ -30,11 +28,15 @@ public class Main {
 	void processStatement(Scanner statement) throws APException {
 		statement.useDelimiter("");
 		statement.skip("\\s*");
-		if (!statement.hasNext() || statement.hasNext("\\/")) {
+		if (!statement.hasNext()) {
+			out.print("Encountered empty line");
+			return;
+		} else if (statement.hasNext("\\/")) {
 			return;
 		} else if (statement.hasNext("[a-zA-Z]")) {
 			processAssignment(statement);
 		} else if (statement.hasNext("\\?")){
+			statement.next();
 			processPrintStatement(statement);
 		} else {
 			throw new APException("Invalid line");
@@ -56,13 +58,24 @@ public class Main {
 	}
 
 	void processPrintStatement (Scanner statement) throws APException {
-		//TODO bepalen of er een fout kan zijn in een print statement: anders kan exception gooien ook weg
-		if (true) { // if geen fouten: print statement
-			out.print(statement); // als er geen fouten kunnen zijn is dit de enige regel
-		} else { 
-			throw new APException("Error processing print statement");
+		statement.useDelimiter("");
+		Collection collection = new Collection();
+		while (statement.hasNext()) {
+			if (statement.hasNext("[a-zA-Z]")) {
+				Identifier identifier = createIdentifier(statement.toString());
+				if (table.contains(identifier)) {
+					collection = (table.retrieve(identifier));
+					printCollection(collection);
+				} else {
+					throw new APException("Set does not exist");
+				}
+			}
 		}
 		// TODO return toevoegen?
+	}
+	
+	void printCollection(Collection collection) {
+		// TODO print collection
 	}
 	
 	Identifier createIdentifier(String statement) throws APException {
@@ -79,15 +92,26 @@ public class Main {
 	}
 	
 	void processExpression(Scanner expression){
-		expression.useDelimiter("\\s*(\\s*|\\s*)\\s*");
-		processSet(set);
+		String set = null;
+		while (expression.hasNext()) {
+			if (expression.next() == "{") {
+				while (expression.hasNext()) {
+					if (expression.next() != "}") {
+						set += expression.next();
+					} else {
+						Collection collection = processSet(set);
+						break;
+					}
+				}
+			}
+		}
 	}
 	
-	Collection processSet(Scanner set) {
-		set.useDelimiter("\\s*,\\s*");
+	Collection processSet(String set) {
+		String[] setArray = set.split(",");
 		Collection collection = new Collection();
-		while (set.hasNext()) {
-			collection.add(set.next()); // collection zou elk type moeten kunnen hebben toch?
+		for (int i = 0; i < setArray.length; i++) {
+			collection.add(setArray[i]); // collection zou elk type moeten kunnen hebben toch?
 		}
 		return collection;
 	}
@@ -132,21 +156,36 @@ public class Main {
 		}
 	}
 	
-	Collection createCollection (String statement){
-		Collection collectionObject = new Collection();
-		for (int i = 0; i < statement.length(); i++) {
-			Identifier identifier = createIdentifier(array[i]);
-			collectionObject.add(statement);
-		}
-		return collectionObject;
-	}
-	
 	Collection processUnion (String statement){
 		Collection collectionUnion = firstCollection.union(secondCollection);
 	}
 	
-	void processFactor (String statement){
+	void processFactor(Scanner expression){
+		Collection collection = new Collection();
+		findOpenParentheses(expression);
 		
+		if (expression.hasNext("\\{")){
+			processSet(expression);
+		}
+		else if (expression.hasNext("[a-zA-Z]")){
+			
+		}
+	}
+	
+	void findOpenParentheses(Scanner expression) {
+		
+		while (expression.hasNext()) {
+			if (expression.next() == "(") {
+				while (expression.hasNext()) {
+					if (expression.next() == ")") {
+						// nog even kijken wat we moeten doen
+					} else if (expression.next() == "(") {
+						
+						// findOpenParentheses
+					}
+				}
+			}
+		}
 	}
 	
 	void processNumber (int num) throws APException {		
