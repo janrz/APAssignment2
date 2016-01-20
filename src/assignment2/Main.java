@@ -2,6 +2,8 @@ package assignment2;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+// jan is cool
+
 public class Main {
 	PrintStream out;
 	APException e;
