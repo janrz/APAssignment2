@@ -5,8 +5,7 @@ import java.util.Scanner;
 public class Main {
 	PrintStream out;
 	APException e;
-	// List<E> list; // TODO wat moet hiermee? stond er nog in
-	Table table = new Table();
+	Table<CollectionInterface<NumberInterface>,IdentifierInterface> table = new Table<CollectionInterface<NumberInterface>,IdentifierInterface>();
 	
 	Main() {
 		out = new PrintStream(System.out);
@@ -22,7 +21,7 @@ public class Main {
 				out.print(e);
 			}
 		}
-		in.close(); // TODO moet deze erin?
+		in.close();
 	}
 	
 	void processStatement(Scanner statement) throws APException {
@@ -47,6 +46,7 @@ public class Main {
 		statement.useDelimiter("\\s*=\\s*");
 		Identifier identifier = createIdentifier(statement.next());
 		if (table.contains(identifier)) {
+			// identifier.remove();
 			identifier = (table.retrieve(identifier));
 		}
 		
@@ -59,7 +59,7 @@ public class Main {
 
 	void processPrintStatement (Scanner statement) throws APException {
 		statement.useDelimiter("");
-		Collection collection = new Collection();
+		CollectionInterface collection = new Collection();
 		while (statement.hasNext()) {
 			if (statement.hasNext("[a-zA-Z]")) {
 				Identifier identifier = createIdentifier(statement.toString());
@@ -74,7 +74,7 @@ public class Main {
 		// TODO return toevoegen?
 	}
 	
-	void printCollection(Collection collection) {
+	void printCollection(CollectionInterface collection) {
 		// TODO print collection
 	}
 	
@@ -94,22 +94,22 @@ public class Main {
 	void processExpression(Scanner expression){
 		String set = null;
 		while (expression.hasNext()) {
-			if (expression.next() == "{") {
-				while (expression.hasNext()) {
-					if (expression.next() != "}") {
-						set += expression.next();
-					} else {
-						Collection collection = processSet(set);
-						break;
-					}
-				}
+			if (nextCharacterIs("(",expression)) {
+				expression.next();
+				processExpression(expression);
+			} else if (expression.hasNext("[a-zA-Z]")) {
+				processTerm(expression);
 			}
 		}
 	}
 	
-	Collection processSet(String set) {
+	void processTerm(Scanner expression) {
+		
+	}
+	
+	CollectionInterface processSet(String set) {
 		String[] setArray = set.split(",");
-		Collection collection = new Collection();
+		CollectionInterface collection = new Collection();
 		for (int i = 0; i < setArray.length; i++) {
 			collection.add(setArray[i]); // collection zou elk type moeten kunnen hebben toch?
 		}
@@ -172,22 +172,6 @@ public class Main {
 		}
 	}
 	
-	void findOpenParentheses(Scanner expression) {
-		
-		while (expression.hasNext()) {
-			if (expression.next() == "(") {
-				while (expression.hasNext()) {
-					if (expression.next() == ")") {
-						// nog even kijken wat we moeten doen
-					} else if (expression.next() == "(") {
-						
-						// findOpenParentheses
-					}
-				}
-			}
-		}
-	}
-	
 	void processNumber (int num) throws APException {		
 	    if (num > 0 && num < 10) {
 			processNotZero(num);
@@ -227,10 +211,12 @@ public class Main {
 	void processSymmetricDifference (String statement){
 	}
 	
-	public static void main(String[] args){ //throws APException {
+	boolean nextCharacterIs(String pattern, Scanner expression) {
+		return expression.hasNext(pattern);
+	}
+	
+	public static void main(String[] args) {
 		new Main().start();
-		//throw new APException("...");
-		//TODO waarom die exception?
 	}
 
 }
