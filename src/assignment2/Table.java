@@ -28,6 +28,8 @@ public class Table< V extends ClonableInterface<V>,K extends DataInterface<K>> i
         return null;
     }
  
+    // TODO vragen of we ipv key ook identifier mogen gebruiken
+    
     @Override
     public boolean contains(K key) {
         table.goToFirst();

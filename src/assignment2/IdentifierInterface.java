@@ -18,7 +18,7 @@ package assignment2;
  * 		POST identifier object contains copy of src
  */
 
-public interface IdentifierInterface {
+public interface IdentifierInterface extends DataInterface<IdentifierInterface>{
 	
 	/** Initializes the identifier object to the ...
 	 * @precondition

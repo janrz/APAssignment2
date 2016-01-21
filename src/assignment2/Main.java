@@ -2,79 +2,82 @@ package assignment2;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-import assignment1.Collections;
-import assignment1.Identifier;
-
 public class Main {
 	PrintStream out;
 	APException e;
-	//List<E> list;
+	Table<CollectionInterface<NumberInterface>,IdentifierInterface> table = new Table<CollectionInterface<NumberInterface>,IdentifierInterface>();
 	
 	Main() {
 		out = new PrintStream(System.out);
 	}
 	
 	void start() {
-		String statement = "hoi = abdc";
 		Scanner in = new Scanner(System.in);
-		while (in.hasNext()){
+		while (in.hasNextLine()){
 			try {
+				Scanner statement = new Scanner(in.nextLine());
 				processStatement(statement);
-			}catch (APException e) {
+			} catch (APException e) {
 				out.print(e);
+			}
+		}
+		in.close();
+	}
+	
+	void processStatement(Scanner statement) throws APException {
+		statement.useDelimiter("");
+		statement.skip("\\s*");
+		if (!statement.hasNext()) {
+			out.print("Encountered empty line");
+			return;
+		} else if (statement.hasNext("\\/")) {
+			return;
+		} else if (statement.hasNext("[a-zA-Z]")) {
+			processAssignment(statement);
+		} else if (statement.hasNext("\\?")){
+			statement.next();
+			processPrintStatement(statement);
+		} else {
+			throw new APException("Invalid line");
+		}
+	}
+
+	void processAssignment(Scanner statement) throws APException {
+		statement.useDelimiter("\\s*=\\s*");
+		Identifier identifier = createIdentifier(statement.next());
+		if (table.contains(identifier)) {
+			// identifier.remove();
+			identifier = (table.retrieve(identifier));
+		}
+		
+		Scanner expression = new Scanner(statement.next());
+		Collection collection = new Collection();
+		processExpression(expression);
+		
+		table.insert(collection, identifier);
+	}
+
+	void processPrintStatement (Scanner statement) throws APException {
+		statement.useDelimiter("");
+		CollectionInterface collection = new Collection();
+		while (statement.hasNext()) {
+			if (statement.hasNext("[a-zA-Z]")) {
+				Identifier identifier = createIdentifier(statement.toString());
+				if (table.contains(identifier)) {
+					collection = (table.retrieve(identifier));
+					printCollection(collection);
+				} else {
+					throw new APException("Set does not exist");
 				}
 			}
 		}
-	
-	void processProgram(Scanner input){
-
-	}
-	
-	void processStatement(String statement) throws APException {	
-		statement = statement.trim();
-		if (statement.isEmpty()) {
-			return;
-			}
-		char ch = statement.charAt(0);
-		if (ch == '/') {
-			processComment(statement);
-		} else if (ch == '?') {
-			processPrintStatement(statement);
-		} else if (Character.isLetter(ch)){
-			processAssignment(statement);
-		} else {
-			throw new APException("ongeldige regel");
-		}
-	}
-	
-	void processComment (String statement) {
-		// TODO bepalen of hier verder nog iets moet gebeuren behalve doorgaan
-		// TODO moet hij ook een exception kunnen gooien? 
-		return;
-	}
-	
-	void processPrintStatement (String statement) throws APException {
-		//TODO bepalen of er een fout kan zijn in een print statement: anders kan exception gooien ook weg
-		if (true) { // if geen fouten: print statement
-			out.print(statement); // als er geen fouten kunnen zijn is dit de enige regel
-		} else { 
-			throw new APException("Error processing print statement");
-		}
 		// TODO return toevoegen?
 	}
-
-	void processAssignment(String statement) throws APException {
-		 StringBuffer identifierStringBuffer = new StringBuffer();
-		 int counter = 0;
-		 while (!(statement.charAt(counter) == '=')){
-			identifierStringBuffer.append(statement.charAt(counter));
-			counter ++;
-		 }
-			Identifier identifier = createIdentifier(identifierStringBuffer.toString());
-			counter +=2;
-			StringBuffer expressionStringBuffer = new StringBuffer();			
-		 }
-
+	
+	void printCollection(CollectionInterface collection) {
+		// TODO print collection
+	}
+	
 	Identifier createIdentifier(String statement) throws APException {
 		statement = statement.trim();
 		Identifier newIdentifier = new Identifier();
@@ -88,79 +91,108 @@ public class Main {
 		return newIdentifier;
 	}
 	
-	void processExpression(String statement){
+	void processExpression(Scanner expression){
+		String set = null;
+		while (expression.hasNext()) {
+			if (nextCharacterIs("(",expression)) {
+				expression.next();
+				processExpression(expression);
+			} else if (expression.hasNext("[a-zA-Z]")) {
+				processTerm(expression);
+			}
+		}
+	}
+	
+	void processTerm(Scanner expression) {
 		
 	}
 	
-	void additiveOperator(String statement) throws APException{	
-		for (int i = 0; i<statement.length(); i++){
-			char ch = statement.charAt((i));
-			if (ch == '+') {
-				processUnion(statement);
-			} else if (ch == '-') {
-				processDifference(statement);
-			} else if (ch == '|'){
-				processSymmetricDifference(statement);
-			} else {
-				throw new APException("No additive operator");
-				}
-			}
+	CollectionInterface processSet(String set) {
+		String[] setArray = set.split(",");
+		CollectionInterface collection = new Collection();
+		for (int i = 0; i < setArray.length; i++) {
+			collection.add(setArray[i]); // collection zou elk type moeten kunnen hebben toch?
 		}
-	
-	void multiplicativeOperator(String statement) throws APException{	
-		for (int i = 0; i<statement.length(); i++){
-			char ch = statement.charAt((i));
-			if (ch == '*') {
-				processIntersection(statement);
-			} else {
-				throw new APException("No multiplicative operator");
-				}
-			}
-		}
-	
-	Collection createCollection (String statement){
-		Collection collectionObject = new Collection();
-		for (int i = 0; i < statement.length(); i++) {
-			Identifier identifier = createIdentifier(array[i]);
-			collectionObject.add(statement);
-		}
-		return collectionObject;
+		return collection;
 	}
 	
+	void additiveOperator(String statement) throws APException{	
+		int i = 0;
+		boolean operatorFound = false;
+		while (i < statement.length() && operatorFound == false) {
+			char ch = statement.charAt(i);
+			if (ch == '+') {
+				operatorFound = true;
+				processUnion(statement);
+			} else if (ch == '-') {
+				operatorFound = true;
+				processDifference(statement);
+			} else if (ch == '|'){
+				operatorFound = true;
+				processSymmetricDifference(statement);
+			} else {
+				i++;
+			}
+		}
+		if (i == statement.length() && operatorFound == false) {
+			throw new APException("No additive operator found");
+		}
+	}
+	
+	void multiplicativeOperator(String statement) throws APException{	
+		int i = 0;
+		boolean operatorFound = false;
+		while (i < statement.length() && operatorFound == false) {
+			char ch = statement.charAt(i);
+			if (ch == '*') {
+				operatorFound = true;
+				processIntersection(statement);
+			} else {
+				i++;
+			}
+		}
+		if (i == statement.length() && operatorFound == false) {
+			throw new APException("No multiplicative operator found");
+		}
+	}
 	
 	Collection processUnion (String statement){
 		Collection collectionUnion = firstCollection.union(secondCollection);
 	}
 	
-	void processFactor (String statement){
+	void processFactor(Scanner expression){
+		Collection collection = new Collection();
+		findOpenParentheses(expression);
+		
+		if (expression.hasNext("\\{")){
+			processSet(expression);
+		}
+		else if (expression.hasNext("[a-zA-Z]")){
+			
+		}
 	}
 	
-	char processNumber (Scanner in) throws APException {
-		Number number = new Number();
-	    if (! in.hasNext("[1-9]")) {
-			number.add(in);
-			}
-			else if (! in.hasNext("[0]")){ 
-			processZero(int input);
-			}
-				else {
-					throw new APException("No valide Number");
-				}
-			}
-
+	void processNumber (int num) throws APException {		
+	    if (num > 0 && num < 10) {
+			processNotZero(num);
+		} else if (num == 0) { 
+			processZero(num);
+		} else {
+			throw new APException("No valid number");
+		}
+	}
 
 	char processZero (int input) throws APException {
 		Number number = new Number();
 		number.add(input);
 		throw new APException("Not zero");
-	    }
+	}
 
-	
 	char processNotZero (int input) throws APException {
 		Number number = new Number();
 		number.add(input);
 		throw new APException("No number object");
-	    }
+	}
 	
 	void processLetter(String statement){
 		char ch = statement.charAt(0);
@@ -179,9 +211,12 @@ public class Main {
 	void processSymmetricDifference (String statement){
 	}
 	
-	public static void main(String[] args){ //throws APException {
+	boolean nextCharacterIs(String pattern, Scanner expression) {
+		return expression.hasNext(pattern);
+	}
+	
+	public static void main(String[] args) {
 		new Main().start();
-		//throw new APException("...");
 	}
 
 }
