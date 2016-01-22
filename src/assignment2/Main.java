@@ -28,7 +28,6 @@ public class Main {
 		statement.useDelimiter("");
 		statement.skip("\\s*");
 		if (!statement.hasNext()) {
-			out.print("Encountered empty line");
 			return;
 		} else if (statement.hasNext("\\/")) {
 			return;
@@ -50,9 +49,11 @@ public class Main {
 			existingCollection = (table.retrieve(identifier));
 		}
 		Scanner expression = new Scanner(statement.next());
-		Collection collection = new Collection();
-		processExpression(expression);
-		
+		CollectionInterface collection = new Collection();
+		if (expression.hasNext("{")) {
+			collection = processSet(expression);
+		}
+		//processExpression(expression);
 		table.insert(collection, identifier);
 	}
 
@@ -102,7 +103,7 @@ public class Main {
 		return newIdentifier;
 	}
 	
-	void processExpression(Scanner expression){
+	void processExpression(Scanner expression) throws APException {
 		String set = null;
 		while (expression.hasNext()) {
 			if (nextCharacterIs("(",expression)) {
@@ -110,6 +111,13 @@ public class Main {
 				processExpression(expression);
 			} else if (expression.hasNext("[a-zA-Z]")) {
 				processTerm(expression);
+			} else if (expression.hasNext("{")){
+				expression.next();
+				processSet(expression);
+			} else if (expression.hasNext("+") || expression.hasNext("-") || expression.hasNext("|")){
+				processAdditiveOperator(expression);
+			} else if (expression.hasNext("*")){
+				processMultiplicativeOperator(expression);
 			}
 		}
 	}
@@ -118,16 +126,21 @@ public class Main {
 		
 	}
 	
-	CollectionInterface processSet(String set) {
-		String[] setArray = set.split(",");
+	CollectionInterface processSet(Scanner set) {
+		//set.useDelimiter(",");
+		set.skip("\\s*");
 		CollectionInterface collection = new Collection();
-		for (int i = 0; i < setArray.length; i++) {
-			collection.add(setArray[i]); // collection zou elk type moeten kunnen hebben toch?
+		while (!set.hasNext("}")) {
+			while (!set.hasNext(",")) {
+				NumberInterface newNumber = new Number();
+				newNumber.add(set.nextInt());
+			}
+			set.next();
 		}
 		return collection;
 	}
 	
-	void additiveOperator(String statement) throws APException{	
+	void processAdditiveOperator(Scanner statement) throws APException{	
 		int i = 0;
 		boolean operatorFound = false;
 		while (i < statement.length() && operatorFound == false) {
@@ -150,7 +163,7 @@ public class Main {
 		}
 	}
 	
-	void multiplicativeOperator(String statement) throws APException{	
+	void processMultiplicativeOperator(Scanner statement) throws APException{	
 		int i = 0;
 		boolean operatorFound = false;
 		while (i < statement.length() && operatorFound == false) {
