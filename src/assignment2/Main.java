@@ -46,10 +46,9 @@ public class Main {
 		statement.useDelimiter("\\s*=\\s*");
 		Identifier identifier = createIdentifier(statement.next());
 		if (table.contains(identifier)) {
-			// identifier.remove();
-			identifier = (table.retrieve(identifier));
+			CollectionInterface<NumberInterface> existingCollection = new Collection();
+			existingCollection = (table.retrieve(identifier));
 		}
-		
 		Scanner expression = new Scanner(statement.next());
 		Collection collection = new Collection();
 		processExpression(expression);
@@ -75,7 +74,19 @@ public class Main {
 	}
 	
 	void printCollection(CollectionInterface collection) {
-		// TODO print collection
+		out.print("{");
+		if (collection.size() > 0) {
+			List<NumberInterface> collectionList = collection.showList(); // TODO mag dit? functie toegevoegd aan Collection
+			collectionList.goToFirst();
+			for (int i = 0; i < collection.size(); i++) {
+				out.print(collectionList.retrieve().toString());
+				if (i < collection.size()) {
+					out.print(", ");
+				}
+				collectionList.goToNext();
+			}
+		}
+		out.print("}");
 	}
 	
 	Identifier createIdentifier(String statement) throws APException {

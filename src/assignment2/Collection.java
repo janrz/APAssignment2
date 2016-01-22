@@ -106,5 +106,9 @@ public class Collection<E extends DataInterface<E>> implements CollectionInterfa
     public int size() {
         return amountElements;
     }
+    
+    public List<E> showList(Collection<E> collection) {
+    	return this.collection;
+    }
 
 }

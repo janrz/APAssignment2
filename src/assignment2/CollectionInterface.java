@@ -108,4 +108,12 @@ public interface CollectionInterface<E extends DataInterface<E>> extends Clonabl
 	 **/
 	Collection<E> clone();
 	
+	/** Returns the list object inside the collection.
+	 * @precondition
+	 * 		-
+	 * @postcondition
+	 * 		The list is returned.
+	 **/
+	List<E> showList();
+	 
 }
